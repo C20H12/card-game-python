@@ -13,7 +13,7 @@ class Deck:
     shuffled = self.shuffleDeck(cardList)
     self._cards = shuffled
 
-  def deal(self, size):
+  def deal(self, size: int):
     '''give out a size number of cards then remove that section from this Deck
        returns a Hand'''
     hand = self._cards[:size]

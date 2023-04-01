@@ -1,5 +1,4 @@
 from Colors import Colors
-from Card import Card
 from functools import cmp_to_key
 
 
@@ -9,7 +8,7 @@ class Card:
     self.color = color
     self.value = value
   
-  def compare(self, other: Card) -> int:
+  def compare(self, other: 'Card') -> int:
     '''compare 2 cards, if their values are the same them compare colors
        returns 1 if this is larger than other, -1 if this is smaller
     '''

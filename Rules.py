@@ -1,6 +1,6 @@
 from Card import Card
-from Player import Player
-from typing import List
+from PlayerInterface import PlayerInterface
+from typing import List, Tuple
 
 
 class Rules():
@@ -39,13 +39,19 @@ class Rules():
     return winningPlayerIdx
 
   @staticmethod
-  def getWinningPlayer(currentRule: str, *players: Player) -> Player:
+  def getWinningPlayer(currentRule: str, players: List[PlayerInterface]) -> Tuple[str, PlayerInterface, List[Card]]:
+    '''
+    gets the winning player from the current rule and the players
+    returns a status, the winning player, and the cards that won the game
+    '''
+    players = list(filter(lambda p: len(p.palette) != 0, players))
+
     # red is special, just get the highest card from all players in a list, then
     # get the highest in that list of highests, then get the the player with that highest card
     if currentRule == Rules.RED:
-      allPlayerHighests = [max(player.palette.cards, key=Card.compareKey) for player in players]
+      allPlayerHighests = [max(player.palette, key=Card.compareKey) for player in players]
       bestHeighest = max(allPlayerHighests, key=Card.compareKey)
-      return players[allPlayerHighests.index(bestHeighest)]
+      return "success", players[allPlayerHighests.index(bestHeighest)], [bestHeighest]
 
     # the other rules requires iterating through the players
     cardsFitsTheRule = []
@@ -53,7 +59,7 @@ class Rules():
       if currentRule == Rules.ORANGE:
         # track the times each *number* appears
         occurences = {}
-        for card in player.palette.cards:
+        for card in player.palette:
           if card.value in occurences:
             occurences[card.value] += 1
           else:
@@ -65,13 +71,13 @@ class Rules():
         mostFrequentKeys = [k for k, v in occurences.items() if v == mostFrequentVal]
         heighestMostFrequentCardValue = max(mostFrequentKeys)
         cardsFitsTheRule.append(
-          [card for card in player.palette.cards if card.value == heighestMostFrequentCardValue]
+          [card for card in player.palette if card.value == heighestMostFrequentCardValue]
         )
         
       if currentRule == Rules.YELLOW:
         # track the times each *color* appears
         occurences = {}
-        for card in player.palette.cards:
+        for card in player.palette:
           if card.color.value in occurences:
             occurences[card.color.value] += 1
           else:
@@ -81,24 +87,24 @@ class Rules():
         mostFrequentVal = max(occurences.values())
         mostFrequentKeys = [k for k, v in occurences.items() if v == mostFrequentVal]
         # if all the colors occured exactly once, there is no repeats, just get the max
-        if len(mostFrequentKeys) == len(player.palette.cards):
-          cardsFitsTheRule.append([max(player.palette.cards, key=Card.compareKey)])
+        if len(mostFrequentKeys) == len(player.palette):
+          cardsFitsTheRule.append([max(player.palette, key=Card.compareKey)])
         else:
           heighestMostFrequentCardValue = max(mostFrequentKeys)
           cardsFitsTheRule.append(
-            [card for card in player.palette.cards if card.color.value == heighestMostFrequentCardValue]
+            [card for card in player.palette if card.color.value == heighestMostFrequentCardValue]
           )
         
       if currentRule == Rules.GREEN:
         # finds all the even numbered cards, store them for later processing
         cardsFitsTheRule.append([
-          card for card in player.palette.cards if card.value % 2 == 0
+          card for card in player.palette if card.value % 2 == 0
         ])
 
       if currentRule == Rules.BLUE:
         # finds the cards with different colors
         uniqCards = {}
-        for card in player.palette.cards:
+        for card in player.palette:
           if card.color not in uniqCards:
             uniqCards[card.color] = card
           else:
@@ -112,7 +118,7 @@ class Rules():
         # first, find all the largest colored card for each number, then sort them
         # each number would only appear once
         uniqCards = {}
-        for card in player.palette.cards:
+        for card in player.palette:
           if card.value not in uniqCards:
             uniqCards[card.value] = card
           else:
@@ -141,15 +147,16 @@ class Rules():
       if currentRule == Rules.VIOLET:
         # finds all cards below 4
         cardsFitsTheRule.append([
-          card for card in player.palette.cards if card.value < 4
+          card for card in player.palette if card.value < 4
         ])
 
-    if all(len(l) == 0 for l  in cardsFitsTheRule):
+    if all(len(l) == 0 for l in cardsFitsTheRule):
       # for GREEN and VIOLET, there is the possibility that no one has the
       # cards that fit the rule, no one wins in this case
-      return None
+      return "failed", None, None
     
-    return players[Rules._getWinningPlayerIndexFromCardsList(cardsFitsTheRule)]
+    winningIdx = Rules._getWinningPlayerIndexFromCardsList(cardsFitsTheRule)
+    return "success", players[winningIdx], cardsFitsTheRule[winningIdx]
   
   @staticmethod
   def get(rule):
@@ -159,6 +166,7 @@ class Rules():
   @staticmethod
   def help():
     # prints the help message for the rules
+    # replace gets rid of the tabs
     print(
       '''
       The rules associated with each color:

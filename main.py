@@ -6,8 +6,6 @@ from inputHelp import getNumber, getString
 class Main:
   @staticmethod
   def game():
-    print("Welcome to card game, red 7")
-  
     mainDeck = Deck()
     
     playerName = getString("Enter your name: ")
@@ -20,13 +18,41 @@ class Main:
                         key=lambda plr: plr.palette.cards[-1].value)
     canvas = {'rule': Rules.RED}
     print(allPlayers)
-    for i in range(len(allPlayers)):
-      allPlayers[i].onTurn(canvas, allPlayers[:i] + allPlayers[i+1:])
+
+    while True:
+      print(allPlayers)
+
+      for i in range(len(allPlayers)):
+        allPlayers[i].onTurn(canvas, allPlayers[:i] + allPlayers[i+1:])
+      result, winningPlayer, winningCards = Rules.getWinningPlayer(canvas['rule'], allPlayers)
+      print(result, winningPlayer, winningCards)
+
+      if result == "failed": 
+        # realisticly shouldn't happen since the turn options are enforced
+        print("Everyone lost due to not having any cards that matches this rule.")
+        break
+      for card in winningCards:
+        winningPlayer.points += card.value
+        winningPlayer.palette.popCard(card)
       
+      for player in allPlayers:
+        if player.isWinning(botsNumber + 1):
+          return player
+        
+        playerCurrentCardAmount = len(player.hand)
+        if playerCurrentCardAmount == 7: 
+          continue
+        player.hand.extendHand(mainDeck.deal(7 - playerCurrentCardAmount))
+
+
   @staticmethod
   def public_static_void_main_string_args():
     # this is a java joke
-    Main.game()
+    # this whole thing is a java joke
+    print("Welcome to card game, red 7")
+
+    ultimateWinner = Main.game()
+    print(ultimateWinner)
     
 
 

@@ -15,12 +15,12 @@ def rulesTest(rule, expectedWinPlayerName):
         player.palette.clearHand()
         player.palette.addCard(*usedCards[i])
         player.palette.printHand()
-      win = Rules.getWinningPlayer(rule, *players)
+      win = Rules.getWinningPlayer(rule, players)
       try:
         if expectedWinPlayerName is None:
-          assert win is None
+          assert win[0] == "failed"
         else:
-          assert win.name == expectedWinPlayerName
+          assert win[1].name == expectedWinPlayerName
       except AssertionError:
         print("result: " + win.name, "expected: " + expectedWinPlayerName)
         raise AssertionError()

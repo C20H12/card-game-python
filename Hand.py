@@ -1,5 +1,5 @@
 from Card import Card
-from typing import List
+from typing import List, Union
 
 
 class Hand:
@@ -23,10 +23,19 @@ class Hand:
   def addCard(self, *cards):
     '''append cards to deck'''
     self.cards += cards
+  
+  def extendHand(self, hand: 'Hand'):
+    self.cards += hand.cards
 
-  def popCard(self, index=-1):
-    '''remove the card at the index and returns it'''
-    return self.cards.pop(index)
+  def popCard(self, index: Union[int, Card] = -1):
+    '''remove the card at the index and returns it
+       or alternatively, find the exact card and pop it
+       raises ValueError if card is not found
+    '''
+    if type(index) is int:
+      return self.cards.pop(index)
+    else:
+      return self.cards.pop(self.cards.index(index))
 
   def sortHand(self):
     '''sort the deck in ascending order'''
@@ -42,3 +51,12 @@ class Hand:
        displays the cards in an array like structure separateed by 2 spaces
        [card1  card2  ]'''
     return str(self.cards).replace(",", "  ")
+
+  def __len__(self):
+    '''returns the number of cards in this hand'''
+    return len(self.cards)
+  
+  def __iter__(self):
+    '''iterate over the cards in this hand'''
+    for card in self.cards:
+      yield card
