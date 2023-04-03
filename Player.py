@@ -14,44 +14,40 @@ class Player:
     self.hand = deck.deal(7).sortHand()
     self.palette = deck.deal(1)
     self.points = 0
+  
+  def setOpponents(self, otherPlayers: List['Player']):
+    self.opponents = otherPlayers
 
-  def _chooseCardIndex(self):
+  def _getWinnableCards(self):
+    winnableCards = []
+    for card in self.hand:
+      self.palette.addCard(card)
+      winPlayer = Rules.getWinningPlayer(Rules.get(card.color.name), self.opponents)
+      if winPlayer == self:
+        winnableCards.append(card)
+      self.palette.popCard()
+    return winnableCards
+
+  def _chooseCardIndex(self, restriced=False):
+    if restriced:
+      
     if self.isBot:
-      return randint(0, len(self.hand.cards) - 1)
+      return randint(0, len(self.hand) - 1)
     self.hand.printHand(pretty=True)
     print("Choose a card, enter a the card name in the format of COLOR <num>:")
     while True:
       cardName = getStringRegex(
         "Enter a card name: ", "^(RED|ORANGE|YELLOW|GREEN|BLUE|INDIGO|VIOLET) [1-7]$"
       )
-      cardsStrArr = [card.toString() for card in self.hand.cards]
+      cardsStrArr = [card.toString() for card in self.hand]
       if cardName in cardsStrArr:
         index = cardsStrArr.index(cardName)
         break
       else:
         print("You don't have this card")
-    return index    
-
-  def _processChoices(self, choice, canvas):
-    match choice:
-      case 1:
-        print(f"{self.name} played a card to palette")
-        cardToPlay = self.hand.popCard(self._chooseCardIndex())
-        self.palette.addCard(cardToPlay)
-      case 2:
-        print(f"{self.name} played a card to the canvas")
-        cardToPlay = self.hand.popCard(self._chooseCardIndex())
-        canvas['rule'] = Rules.get(cardToPlay.color.name)
-      case 3:
-        print(f"{self.name} played a card played a card to palette and canvas")
-        cardToPlay = self.hand.popCard(self._chooseCardIndex())
-        self.palette.addCard(cardToPlay)
-        canvas['rule'] = Rules.get(cardToPlay.color.name)
-      case 4:
-        print(f"{self.name} chose to lose")
-        self.onLose()
+    return True, index
   
-  def _humanPlayerOptions(self, otherPlayers: List['Player'], canvas):
+  def _humanPlayerOptions(self, canvas):
     print(f"{self.name}, here are your available actions:")
     while True:
       print(f"Current turn rule is: {canvas['rule']}")
@@ -61,11 +57,70 @@ class Player:
       print("4 - Do nothing, and lose.")
       print("5 - Check ...")
       choice = getNumber(int, "Enter an action to select: ", range=(1, 5))
-      
+
       if choice in (1, 2, 3, 4):
-        self._processChoices(choice, canvas)
-        break
+        return choice
       else:
+        while True:
+          print("1 - Check your cards.")
+          print("2 - Check your palette..")
+          print("3 - Check opponents' palettes.")
+          print("4 - Check the rules associated with each color..")
+          print("5 - Back.")
+          choice = getNumber(int, "Enter an action to select: ", range=(1, 5))
+          match choice:
+            case 1:
+              print("Your cards:")
+              self.hand.printHand(pretty=True)
+            case 2:
+              print("Your palette:")
+              self.palette.printHand(pretty=True)
+            case 3:
+              for player in self.opponents:
+                print()
+                print(f"{player.name}'s palettes:")
+                player.palette.printHand(pretty=True)
+            case 4:
+              Rules.help()
+            case 5:
+              break
+
+  def onTurn(self, canvas):
+    choice = 0
+    if self.isBot:
+      choice = randomChoices(population=[1, 2, 3, 4], weights=[0.74, 0.12, 0.12, 0.02])[0]
+    else:
+      choice = self._humanPlayerOptions(canvas)
+     
+    match choice:
+      case 1:
+        _, result = self._chooseCardIndex()
+        print(f"{self.name} played a card to palette")
+        cardToPlay = self.hand.popCard(result)
+        self.palette.addCard(cardToPlay)
+        break
+      case 2:
+        success, result = self._chooseCardIndex(True)
+        if not success:
+          continue
+        print(f"{self.name} played a card to the canvas")
+        cardToPlay = self.hand.popCard(result)
+        canvas['rule'] = Rules.get(cardToPlay.color.name)
+        break
+      case 3:
+        success, result = self._chooseCardIndex(True)
+        if not success:
+          continue
+        print(f"{self.name} played a card to the palette and canvas")
+        cardToPlay = self.hand.popCard(result)
+        self.palette.addCard(cardToPlay)
+        canvas['rule'] = Rules.get(cardToPlay.color.name)
+        break
+      case 4:
+        print(f"{self.name} chose to lose")
+        self.onLose()
+        break
+      case 5:
         while True:
           print("1 - Check your cards.")
           print("2 - Check your palette..")
@@ -89,14 +144,6 @@ class Player:
               Rules.help()
             case 5:
               break
-
-  def onTurn(self, canvas, otherPlayers: List['Player']):
-    choice = 0
-    if self.isBot:
-      choice = randomChoices(population=[1, 2, 3, 4], weights=[0.74, 0.12, 0.12, 0.02])[0]
-      self._processChoices(choice, canvas)
-    else:
-      self._humanPlayerOptions(otherPlayers, canvas)
     print(f"Turn over for {self.name}")
   
   def isWinning(self, totalPlayers: int):

@@ -16,14 +16,20 @@ class Main:
     
     allPlayers = sorted([humanPlayer, *botPlayers], 
                         key=lambda plr: plr.palette.cards[-1].value)
+    
+    for i in range(len(allPlayers)):
+      allPlayers[i].setOpponents(allPlayers[:i] + allPlayers[i+1:])
+
+    # use a mutable dict so that it is passed by reference
     canvas = {'rule': Rules.RED}
     print(allPlayers)
 
     while True:
       print(allPlayers)
 
-      for i in range(len(allPlayers)):
-        allPlayers[i].onTurn(canvas, allPlayers[:i] + allPlayers[i+1:])
+      for player in allPlayers:
+        player.onTurn(canvas)
+
       result, winningPlayer, winningCards = Rules.getWinningPlayer(canvas['rule'], allPlayers)
       print(result, winningPlayer, winningCards)
 
