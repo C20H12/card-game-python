@@ -60,3 +60,7 @@ class Hand:
     '''iterate over the cards in this hand'''
     for card in self.cards:
       yield card
+  
+  def __contains__(self, card):
+    '''check if the card is in this hand'''
+    return card in self.cards
