@@ -1,17 +1,20 @@
-from random import randint
 from Card import Card
 from Colors import Colors
 from Hand import Hand
+from random import randint
 
 class Deck:
   '''represents a deck, contains all the cards the game is going to use'''
-  def __init__(self):
+  def __init__(self, initCards=None):
     '''builds the deck of 49 cards, using a nested list comp'''
-    cardList = [Card(color, num) \
-                for num in range(1, 8) \
-                for color in iter(Colors)]
-    shuffled = self.shuffleDeck(cardList)
-    self._cards = shuffled
+    if initCards == None:
+      cardList = [Card(color, num) \
+                  for num in range(1, 8) \
+                  for color in iter(Colors)]
+      shuffled = self.shuffleCards(cardList)
+      self._cards = shuffled
+    else:
+      self._cards = self.shuffleCards(initCards[:])
 
   def deal(self, size: int):
     '''give out a size number of cards then remove that section from this Deck
@@ -20,7 +23,7 @@ class Deck:
     del self._cards[:size]
     return Hand(hand)
 
-  def shuffleDeck(self, deck=None):
+  def shuffleCards(self, cards):
     '''
     Shuffles the deck of cards to a random order
     - uses the Fisher-Yates shuffle algorithm
@@ -28,12 +31,16 @@ class Deck:
       with the current index
     - returns the shuffled list
     '''
-    deck = deck or self._cards
-    if len(deck) == 0:
-      return deck
-    length = len(deck)
+    if len(cards) == 0:
+      return cards
+    length = len(cards)
     for i in range(length - 2):
       randomIdx = randint(i, length - 1)
-      deck[i], deck[randomIdx] = deck[randomIdx], deck[i]
-    return deck
+      cards[i], cards[randomIdx] = cards[randomIdx], cards[i]
+    return cards
 
+  def extendDeck(self, otherDeck: 'Deck'):
+    self._cards += otherDeck._cards
+  
+  def __repr__(self):
+    return str(self._cards)
