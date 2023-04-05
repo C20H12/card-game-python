@@ -39,11 +39,13 @@ class Rules():
     return winningPlayerIdx
 
   @staticmethod
-  def getWinningPlayer(currentRule: str, players: List[PlayerInterface]) -> Tuple[str, PlayerInterface, List[Card]]:
+  def getWinningPlayer(currentRule: str, players: List[PlayerInterface]) \
+    -> Tuple[str, PlayerInterface, List[Card]]:
     '''
     gets the winning player from the current rule and the players
     returns a status, the winning player, and the cards that won the game
     '''
+    # filter out players that have no cards 
     players = list(filter(lambda p: len(p.palette) != 0, players))
 
     # red is special, just get the highest card from all players in a list, then
@@ -159,9 +161,9 @@ class Rules():
     return "success", players[winningIdx], cardsFitsTheRule[winningIdx]
   
   @staticmethod
-  def get(rule):
+  def get(colorName):
     # Return the rule corresponding to the rule color.
-    return Rules.__dict__[rule]
+    return Rules.__dict__[colorName]
 
   @staticmethod
   def help():
