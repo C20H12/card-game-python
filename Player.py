@@ -1,9 +1,11 @@
+from Card import Card
 from Deck import Deck
 from Hand import Hand
+from inputHelp import getNumber
+from random import randint, choices as randomChoices
+from re import match as regexMatch
 from Rules import Rules
 from typing import List
-from random import randint, choices as randomChoices
-from inputHelp import getNumber, getStringRegex
 
 
 class Player:
@@ -31,21 +33,23 @@ class Player:
       )
       if status == "failed":
         continue
-      print(winPlayer, _)
       if winPlayer == self:
         winnableCards.addCard(card)
     return winnableCards
 
-  def _chooseCardIndex(self, fromCards=None):
+  def _chooseCardIndexFromHand(self, fromCards=None):
     fromCards = fromCards or self.hand
     if self.isBot:
       return randint(0, len(fromCards) - 1)
     fromCards.printHand(pretty=True)
     print("Choose a card, enter a the card name in the format of COLOR <num>:")
     while True:
-      cardName = getStringRegex(
-        "Enter a card name: ", "^(RED|ORANGE|YELLOW|GREEN|BLUE|INDIGO|VIOLET) [1-7]$"
-      )
+      while not regexMatch(
+        "^(RED|ORANGE|YELLOW|GREEN|BLUE|INDIGO|VIOLET) [1-7]$",
+        cardName := input("Enter a card to select: ").upper(),
+      ):
+        print("Input does not match pattern!")
+      
       cardsStrArr = [card.toString() for card in fromCards]
       if cardName in cardsStrArr:
         index = cardsStrArr.index(cardName)
@@ -56,8 +60,8 @@ class Player:
   
   def _humanPlayerOptions(self, canvas):
     print(f"{self.name}, here are your available actions:")
+    print("------")
     while True:
-      print(f"==== Current turn rule is: {canvas['rule']} ==== ")
       print("1 - Play a card your Palette.")
       print("2 - Play a card to the Canvas to change the game rule.")
       print("3 - Play a card to your Palette AND THEN discard a card to the Canvas.")
@@ -92,7 +96,7 @@ class Player:
             break
   
   def _playToPalette(self):
-    index = self._chooseCardIndex()
+    index = self._chooseCardIndexFromHand()
     cardToPlay = self.hand.popCard(index)
     self.palette.addCard(cardToPlay)
     print(f"{self.name} played a card to palette")
@@ -104,8 +108,8 @@ class Player:
       print("You can only play to your palette.")
       self._playToPalette()
       return True
-    index = self._chooseCardIndex(winnableCards) # todo: test this
-    cardToPlay = self.hand.popCard(winnableCards[index])
+    index = self._chooseCardIndexFromHand(winnableCards)
+    cardToPlay = self.hand.popCard(winnableCards.cards[index])
     canvas['rule'] = Rules.get(cardToPlay.color.name)
     print(f"{self.name} played a card to the canvas")
     return False
@@ -150,11 +154,17 @@ class Player:
     if totalPlayers == 4:
       return self.points >= 30
 
-  def onTurnWin(self):
-    print(f"Congrats, {self.name}, you have won!")
+  def onTurnWin(self, winningCards: List['Card']):
+    for card in winningCards:
+      self.points += card.value
+      self.palette.popCard(card)
+    print(f"*** Congrats, {self.name} has won this round!")
+    print(f'The winning cards are {winningCards}')
+    print(f'Current points: {self.points}')
 
   def onTurnLose(self):
-    print(f"Too bad, {self.name}, you lost!")
+    print(f"*** Too bad, {self.name} has lost this round!")
+    print(f"Current points: {self.points}")
 
   def __repr__(self):
     outStr = '\n'
