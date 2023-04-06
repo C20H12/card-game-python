@@ -50,7 +50,7 @@ class Rules():
 
     # red is special, just get the highest card from all players in a list, then
     # get the highest in that list of highests, then get the the player with that highest card
-    if currentRule == Rules.RED:
+    if len(players) != 0 and currentRule == Rules.RED:
       allPlayerHighests = [max(player.palette, key=Card.compareKey) for player in players]
       bestHeighest = max(allPlayerHighests, key=Card.compareKey)
       return "success", players[allPlayerHighests.index(bestHeighest)], [bestHeighest]

@@ -43,10 +43,11 @@ class Card:
   def toString(self):
     '''return a string representation of the card'''
     return f"{self.color.name} {self.value}"
+  
+  def valueOf(self):
+    return self.value * 10 + self.color.value
 
   def __repr__(self):
     '''string representation of the class
        useful for debug printing'''
     return self.toString()
-
-
