@@ -8,18 +8,21 @@ from typing import List
 
 
 class Player:
-  '''represents a player, tracks its hand, palette and points
-     contains functions to act in a turn'''
+  '''
+  represents a player, tracks its hand, palette and points
+    contains functions to act in a turn
+  '''
   def __init__(self, name: str, isBot: bool):
     self.name = name
     self.isBot = isBot
     self.points = 0
   
   '''
-  these methods set up the player
+  these chaining methods set up the player
   design pattern: creational - builder
-    allows for a more readable flexible way to create a player
-  they also allow chaining
+    allows for a more readable and flexible way to create a player
+  relationship: Hand - composition
+    player owns a hand, the hand cannot exist without the player
   '''
   def setHand(self, hand: Hand):
     self.hand = hand
@@ -37,6 +40,9 @@ class Player:
     self.canvas = canvas
     return self
 
+  '''
+  private helper functions
+  '''
   def _getWinnableCards(self):
     '''
     looks for cards which when changed to the card's rule, 
@@ -92,16 +98,16 @@ class Player:
   
   def _humanPlayerOptions(self):
     '''
-    prints the human's options, then allows the player to choose a turn option
+    prints the human's options, then allow the player to choose a turn option
     or an option to check the game state (cards, palettes, rules)
-    returns the turn choice made
+    returns the choice (the human player) makes
     '''
     print(f"{self.name}, here are your available actions:")
     print("------")
     while True:
       print("1 - Play a card your Palette.")
       print("2 - Play a card to the Canvas to change the game rule.")
-      print("3 - Play a card to your Palette AND THEN discard a card to the Canvas.")
+      print("3 - Play a card to your Canvas AND THEN discard a card to the Palette.")
       print("4 - Do nothing, and lose.")
       print("5 - Check ...")
       choice = getNumber(int, "Enter an action to select: ", range=(1, 5))
@@ -123,10 +129,10 @@ class Player:
             print("Your palette:")
             self.palette.printHand(pretty=True)
           elif choice == 3:
-            for player in self._opponents:
+            for opponent in self._opponents:
               print()
-              print(f"{player.name}'s palettes:")
-              player.palette.printHand(pretty=True)
+              print(f"{opponent.name}'s palettes:")
+              opponent.palette.printHand(pretty=True)
           elif choice == 4:
             Rules.help()
           elif choice == 5:
@@ -149,6 +155,7 @@ class Player:
     -allows the player to choose a card from their own hand
       then removes the card from the hand and adds it to the canvas
     aborts if the player has no winnable cards
+      and falls back to playing to the palette
     returns if the process was aborted
     '''
     winnableCards = self._getWinnableCards()
@@ -164,15 +171,29 @@ class Player:
     print(f"### Rules Changed to: f{self.canvas['rule']}")
     return False
 
+  '''
+  public event handlers
+  design pattern: behavioral - observer
+    a one-to-many dependency relationship (game to players), 
+    the player will change state when game notifies it to  
+  '''
   def onTurn(self):
+    '''
+    on the player's turn the player can choose a action to perform
+    '''
     choice = 0
     if self.isBot:
+      # if it a bot, check if it has winnable cards
+      # ie. can choose option 2 or 3
       winnableCards = self._getWinnableCards()
-      if len(winnableCards) == 0:
+      if len(winnableCards) == 0: # can't
         choice = 1
-      else:
+      else: # can, choose a random one
+        # the weights affect the probability of choosing each option
+        # so it doesn't always choose to lose
         choice = randomChoices(population=[1, 2, 3, 4], weights=[0.74, 0.12, 0.12, 0.02])[0]
     else:
+      # display menu text and get a choice from input
       choice = self._humanPlayerOptions()
      
     if choice == 1:
@@ -186,11 +207,17 @@ class Player:
     elif choice == 4:
       print(f"{self.name} chose to lose")
       self.onTurnLose()
-      return "quit"
     
     print(f"Turn over for {self.name}")
+    print()
 
   def onTurnWin(self, winningCards: List['Card']):
+    '''
+    display a message for winning a round
+    on a win, the player's points increase by the value 
+      of the numbers on the cards they win with
+    prints out the winning cards and points
+    '''
     for card in winningCards:
       self.points += card.value
       self.palette.popCard(card)
@@ -199,6 +226,10 @@ class Player:
     print(f'Current points: {self.points}')
 
   def onTurnLose(self):
+    '''
+    display a message for losing a round
+    prints out the points
+    '''
     print(f"*** Too bad, {self.name} has lost this round!")
     print(f"Current points: {self.points}")
 
@@ -217,6 +248,10 @@ class Player:
       return self.points >= 30
 
   def __repr__(self):
+    '''
+    string represtation of the player
+    the opponents list is shrinked to a non verbose list
+    '''
     outStr = '\n'
     for k, v in self.__dict__.items():
       if k == '_opponents':

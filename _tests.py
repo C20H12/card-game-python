@@ -31,7 +31,7 @@ def rulesTest(rule, expectedWinPlayerName):
 deck = Deck()
 players = [Player("p" + str(i + 1), False, deck) for i in range(3)]
 
-
+'''unit tests for the rules'''
 
 @rulesTest(Rules.RED, "p1")
 def test_playerWithLargestCard(players):

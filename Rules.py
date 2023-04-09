@@ -4,8 +4,9 @@ from typing import List, Tuple
 
 
 class Rules():
-  '''list of constants, color maps to rule'''
-  
+  '''
+  list of constants, color maps to rule
+  '''
   RED = "Heighest card"
   ORANGE = "Most cards with the same number"
   YELLOW = "Most cards with the same color"
@@ -16,8 +17,10 @@ class Rules():
 
   @staticmethod
   def _getWinningPlayerIndexFromCardsList(filteredCards: List[List[Card]]) -> int:
-    '''finds the player that is ultimately winning from their cards that fits the rule
-      filteredCards Card[][] - a 2d array of players of cards they can use for this round'''
+    '''
+    finds the player that is ultimately winning from their cards that fits the rule
+    filteredCards Card[][] - a 2d array of players of cards they can use for this round
+    '''
     # initialize the winning player to the first one on the list
     winningPlayerIdx = 0
     winningLen = len(filteredCards[0])
@@ -162,13 +165,17 @@ class Rules():
   
   @staticmethod
   def get(colorName):
-    # Return the rule corresponding to the rule color.
+    '''
+    Return the rule corresponding to the rule color
+    '''
     return Rules.__dict__[colorName]
 
   @staticmethod
   def help():
-    # prints the help message for the rules
-    # replace gets rid of the tabs
+    '''
+    prints the help message for the rules
+    replace gets rid of the tabs
+    '''
     print(
       '''
       The rules associated with each color:

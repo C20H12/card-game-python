@@ -3,10 +3,12 @@ from Hand import Hand
 
 
 class PlayerInterface:
-  '''a simple representation of player, kind of like an interface in java
-     also needed to get around the cyclic import error when annotating the Rules functions
-     (Rules imports Player & Player imports Rules)
-     also, maximum java immersive-ness ykyk'''
+  '''
+  a simple (abstract) representation of player, kind of like an interface 
+  also needed to get around the cyclic import error when annotating the Rules functions
+  (Rules imports Player & Player imports Rules)
+  also, maximum java immersive-ness
+  '''
   name: str # public 
   isBot: bool # public
   hand: Hand # public

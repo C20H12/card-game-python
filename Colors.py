@@ -1,7 +1,9 @@
 from enum import Enum
 
 class Colors(Enum):
-  '''a group of constants, each color maps to its procedance'''
+  '''
+  a group of constants, each color maps to its procedance
+  '''
   RED = 7
   ORANGE = 6
   YELLOW = 5
@@ -11,9 +13,10 @@ class Colors(Enum):
   VIOLET = 1
 
   @staticmethod
-  def printColored(color, text, **kwargs):
-    '''print colored text using unix shell escape sequences
-       format: \33[48;2;fore_r;fore_g;fore_b;38;2;back_r;back_g;back_bm]
+  def printColored(color: 'Colors', text, **kwargs):
+    '''
+    print colored text using unix shell escape sequences
+    format: \33[48;2;fore_r;fore_g;fore_b;38;2;back_r;back_g;back_bm]
     '''
     colors = { 
       "RED":'\033[48;2;196;0;0;38;2;59;255;255m',

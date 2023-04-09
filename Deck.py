@@ -4,30 +4,37 @@ from Hand import Hand
 from random import randint
 
 class Deck:
-  '''represents a deck, contains all the cards the game is going to use
-     - design pattern: creational - singleton
-       only a single instance would be created for each game
-       and all players access one main deck
-       this is done because in an actual card game, you would only have one 
-       deck from which player draws from
+  '''
+  represents a deck, contains all the cards the game is going to use
+  design pattern: creational - singleton
+    only a single instance would be created for each game
+    and all players access one main deck
+    this is done because it makes sense in an actual card game, 
+    you would only have one deck from which player draws from
   '''
   def __init__(self):
-    '''builds the deck of 49 cards, using a nested list comprehension'''
+    '''
+    builds the deck of 49 cards, using a nested list comprehension
+    '''
     cardList = [Card(color, num) \
                 for num in range(1, 8) \
                 for color in iter(Colors)]
-    shuffled = self.shuffleCards(cardList)
+    shuffled = Deck.shuffleCards(cardList)
     self._cards = shuffled
 
   def deal(self, size: int):
-    '''give out a size number of cards then remove that section from this Deck
-       - returns a Hand
-       - design pattern: creational - factory method'''
+    '''
+    give out a size number of cards then remove that section from this Deck
+    design pattern: creational - factory method
+      creates a new Hand object with the specified parameter
+    returns a Hand
+    '''
     hand = self._cards[:size]
     del self._cards[:size]
     return Hand(hand)
 
-  def shuffleCards(self, cards):
+  @staticmethod
+  def shuffleCards(cards):
     '''
     Shuffles the deck of cards to a random order
     uses the Fisher-Yates shuffle algorithm
@@ -52,5 +59,7 @@ class Deck:
     self._cards += cards
   
   def __repr__(self):
-    '''string representation, hooks the repr of cards'''
+    '''
+    string representation, hooks the repr of cards
+    '''
     return str(self._cards)
