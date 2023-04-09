@@ -8,7 +8,7 @@ Some strategies can be applied to the game to change the rules so that you can m
 
 ## Components
 - 49 cards, 1-7 \* 7 colors.
-- *Canvas*, which holds the card that determines the rule <sup>1[info](#footnotes)</sup>.
+- *Canvas*, which holds the card that determines the rule <sup>1[info](#footnote)</sup>.
 - Players:
   - A hand of cards
     - The cards here are kept secret
@@ -47,10 +47,10 @@ A Turn is finished when every player has gone once.
 - Everyone's hand will be replenished to 7 cards.
 
 ### End of the game:
-- Based on how many players there are, a threashold of points will be selected <sup>2[info](#footnotes)</sup>.
+- Based on how many players there are, a threashold of points will be selected <sup>2[info](#footnote)</sup>.
 - Once a player reaches the target points, the game immediately ends.
 - The placements of the players are determined by their points.
 
 #### footnote
-1 - ![rules](./img/rules.jpg)
+1 - ![rules](./img/rules.jpg)  
 2 - ![points](./img/points.jpg)
