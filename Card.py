@@ -48,11 +48,11 @@ class Card:
     '''
     print(f"{self.color.name} {self.value}")
 
-  def toString(self):
+  def toAbbreviatedString(self):
     '''
-    return a string representation of the card
+    return a abbreviation of the card
     '''
-    return f"{self.color.name} {self.value}"
+    return f"{self.color.name[0].lower()}{self.value}"
   
   def valueOf(self):
     '''
@@ -63,5 +63,6 @@ class Card:
   def __repr__(self):
     '''
     string representation of the class
-    useful for debug printing'''
-    return self.toString()
+    useful for debug printing
+    '''
+    return f"{self.color.name} {self.value}"

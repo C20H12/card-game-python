@@ -80,15 +80,17 @@ class Player:
     if self.isBot:
       return randint(0, len(fromCards) - 1)
     fromCards.printHand(pretty=True)
-    print("Choose a card, enter a the card name in the format of COLOR <num>:")
+    print(
+      "Choose a card, enter a the card name in the format of <color's first letter><number>:"
+    )
     while True:
       while not regexMatch(
-        "^(RED|ORANGE|YELLOW|GREEN|BLUE|INDIGO|VIOLET) [1-7]$",
-        cardName := input("Enter a card to select: ").upper(),
+        "^[roygbiv][1-7]$",
+        cardName := input("Enter a card to select: "),
       ):
         print("Input does not match pattern!")
       
-      cardsStrArr = [card.toString() for card in fromCards]
+      cardsStrArr = [card.toAbbreviatedString() for card in fromCards]
       if cardName in cardsStrArr:
         index = cardsStrArr.index(cardName)
         break
@@ -168,7 +170,7 @@ class Player:
     cardToPlay = self.hand.popCard(winnableCards.cards[index])
     self.canvas['rule'] = Rules.get(cardToPlay.color.name)
     print(f"{self.name} played a card to the canvas")
-    print(f"### Rules Changed to: f{self.canvas['rule']}")
+    print(f"### Rules Changed to: {self.canvas['rule']}")
     return False
 
   '''
