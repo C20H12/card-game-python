@@ -76,9 +76,6 @@ class Main:
         # call the onTurnWin or onTurnLose event for each player
         if player == winningPlayer:
           player.onTurnWin(winningCards)
-          # refill the player's hand to 7 cards
-          playerCurrentCardAmount = len(player.hand)
-          player.hand.extendHand(mainDeck.deal(7 - playerCurrentCardAmount))
         else:
           player.onTurnLose()
         print()
@@ -87,6 +84,12 @@ class Main:
         if player.isWinningGame(botsNumber + 1):
           Main.onGameOver(allPlayers)
           return
+        
+        # refill the player's hand to 7 cards if it is below 7
+        playerCurrentCardAmount = len(player.hand)
+        if playerCurrentCardAmount == 7:
+          continue
+        player.hand.extendHand(mainDeck.deal(7 - playerCurrentCardAmount))
       
       # since the winning cards are removed from the player's palette
       # they can be reused by the deck
