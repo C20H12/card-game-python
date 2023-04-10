@@ -207,8 +207,7 @@ class Player:
       if not aborted:
         self._playToPalette()
     elif choice == 4:
-      print(f"{self.name} chose to lose")
-      self.onTurnLose()
+      print(f"{self.name} chose to do nothing.")
     
     print(f"Turn over for {self.name}")
     print()
@@ -248,6 +247,7 @@ class Player:
       return self.points >= 35
     if totalPlayers == 4:
       return self.points >= 30
+
 
   def __repr__(self):
     '''

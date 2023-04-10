@@ -36,7 +36,7 @@ A player has several options:
   - You must win the new game after you do this. (Doing this won't make you lose)
 - Play a card to the *Canvas*, **then**, play to the palette
   - If you cannot play to the canvas due to the reason above, you can only play to the palette
-- Do nothing and lose this turn. Pretty much useless in this version other than skipping a turn.  
+- Do nothing for this turn. Pretty much useless in this version other than skipping a turn.  
 A Turn is finished when every player has gone once.  
 
 ### End of a Turn:
